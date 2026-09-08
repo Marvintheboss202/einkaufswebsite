@@ -1,999 +1,1213 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>🛒 Einkauf</title>
-
-<style>
-
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    margin: 0;
-    background: #f2f3f5;
-    font-family: Arial, sans-serif;
-    color: #222;
-}
-
-.container {
-    width: 100%;
-    max-width: 600px;
-    margin: auto;
-    padding: 15px;
-}
-
-header {
-    background: white;
-    padding: 22px;
-    border-radius: 20px;
-    text-align: center;
-    margin-bottom: 15px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.08);
-}
-
-header h1 {
-    margin: 0;
-    font-size: 29px;
-}
-
-header p {
-    color: #777;
-    margin-bottom: 0;
-}
-
-.card {
-    background: white;
-    padding: 17px;
-    border-radius: 18px;
-    margin-bottom: 15px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.06);
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 7px;
-}
-
-input,
-textarea {
-    width: 100%;
-    padding: 14px;
-    font-size: 17px;
-    border: 1px solid #d4d7db;
-    border-radius: 12px;
-    background: #fafafa;
-    outline: none;
-}
-
-input:focus,
-textarea:focus {
-    background: white;
-    border-color: #555;
-}
-
-textarea {
-    min-height: 180px;
-    resize: vertical;
-    font-family: monospace;
-}
-
-.category-title {
-    font-size: 21px;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.product {
-    position: relative;
-    background: #f5f6f7;
-    padding: 12px;
-    padding-right: 55px;
-    border-radius: 13px;
-    margin-bottom: 10px;
-}
-
-.product input {
-    margin-bottom: 8px;
-}
-
-.product input:last-of-type {
-    margin-bottom: 0;
-}
-
-.delete {
-    position: absolute;
-    top: 10px;
-    right: 9px;
-
-    width: 37px;
-    height: 37px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #ffdede;
-
-    font-size: 17px;
-}
-
-.add-button {
-    width: 100%;
-    padding: 13px;
-
-    background: white;
-
-    border: 2px dashed #bbb;
-    border-radius: 12px;
-
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.send-button {
-    width: 100%;
-    padding: 17px;
-
-    border: none;
-    border-radius: 14px;
-
-    background: #222;
-    color: white;
-
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.admin-button {
-    display: none;
-
-    width: 100%;
-    margin-top: 10px;
-    padding: 14px;
-
-    border: none;
-    border-radius: 13px;
-
-    background: #673de6;
-    color: white;
-
-    font-size: 17px;
-    font-weight: bold;
-}
-
-.back-button {
-    width: 100%;
-    padding: 14px;
-
-    border: none;
-    border-radius: 13px;
-
-    background: #e8e9eb;
-
-    font-size: 16px;
-    font-weight: bold;
-}
-
-#adminPanel {
-    display: none;
-}
-
-.order-result {
-    background: #f5f6f7;
-    padding: 15px;
-    border-radius: 15px;
-    margin-top: 15px;
-}
-
-.order-name {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.admin-category {
-    font-weight: bold;
-    margin-top: 12px;
-}
-
-.admin-product {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-top: 6px;
-}
-
-.message {
-    display: none;
-    padding: 13px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.success {
-    display: block;
-    background: #dff6e4;
-    color: #17652a;
-}
-
-.error {
-    display: block;
-    background: #ffe0e0;
-    color: #8a1717;
-}
-
-.small {
-    color: #777;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-button {
-    cursor: pointer;
-}
-
-button:active {
-    transform: scale(.98);
-}
-
-.hidden {
-    display: none !important;
-}
-
-</style>
-</head>
-
-
-<body>
-
-<div class="container">
-
-
-<header>
-
-    <h1>🛒 Einkauf</h1>
-
-    <p>
-        Trag ein, was du gerne möchtest.
-    </p>
-
-</header>
-
-
-<div id="message" class="message"></div>
-
-
-<!-- ========================= -->
-<!-- PERSON -->
-<!-- ========================= -->
-
-<div class="card">
-
-    <label>
-        Wer bist du?
-    </label>
-
-    <input
-        id="person"
-        type="text"
-        placeholder="z. B. Lion"
-        autocomplete="off"
-    >
-
-    <button
-        id="adminButton"
-        class="admin-button"
-        onclick="openAdmin()">
-
-        👑 Admin-Bereich
-
-    </button>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- NORMALE WEBSITE -->
-<!-- ========================= -->
-
-<div id="shoppingArea">
-
-
-<!-- TIEFKÜHL -->
-
-<div class="card">
-
-    <div class="category-title">
-        🧊 Tiefkühl
-    </div>
-
-    <div id="frozenProducts"></div>
-
-    <button
-        class="add-button"
-        onclick="addProduct('frozenProducts')">
-
-        ＋ Produkt hinzufügen
-
-    </button>
-
-</div>
-
-
-<!-- KÜHL -->
-
-<div class="card">
-
-    <div class="category-title">
-        ❄️ Kühl
-    </div>
-
-    <div id="coldProducts"></div>
-
-    <button
-        class="add-button"
-        onclick="addProduct('coldProducts')">
-
-        ＋ Produkt hinzufügen
-
-    </button>
-
-</div>
-
-
-<!-- NORMAL -->
-
-<div class="card">
-
-    <div class="category-title">
-        🛍️ Normal
-    </div>
-
-    <div id="normalProducts"></div>
-
-    <button
-        class="add-button"
-        onclick="addProduct('normalProducts')">
-
-        ＋ Produkt hinzufügen
-
-    </button>
-
-</div>
-
-
-<!-- ABSENDEN -->
-
-<div class="card">
-
-    <button
-        class="send-button"
-        onclick="sendOrder()">
-
-        📧 Bestellung per E-Mail senden
-
-    </button>
-
-    <p class="small">
-        Beim Absenden wird deine Mail-App geöffnet.
-        Die Bestellung wird automatisch als Code
-        in die E-Mail eingefügt.
-    </p>
-
-</div>
-
-
-</div>
-
-
-<!-- ========================= -->
-<!-- ADMIN -->
-<!-- ========================= -->
-
-<div id="adminPanel">
-
-
-<div class="card">
-
-    <h2>👑 Admin-Bereich</h2>
-
-    <p>
-        Füge hier den Bestellcode aus der E-Mail ein.
-    </p>
-
-    <textarea
-        id="codeInput"
-        placeholder="Bestellcode hier einfügen..."
-    ></textarea>
-
-    <br><br>
-
-    <button
-        class="send-button"
-        onclick="decodeOrder()">
-
-        🔓 Bestellung entschlüsseln
-
-    </button>
-
-</div>
-
-
-<div id="decodedOrder"></div>
-
-
-<div class="card">
-
-    <button
-        class="back-button"
-        onclick="closeAdmin()">
-
-        ← Zurück
-
-    </button>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<script>
-
-
-/*
-============================================================
-EINSTELLUNGEN
-============================================================
-*/
-
-
-/*
-DEINE E-MAIL-ADRESSE HIER EINTRAGEN
-*/
-
-const ADMIN_EMAIL = "lion.born@convos.schule";
-
-
-/*
-Dieser Schlüssel wird zum Verschlüsseln
-und Entschlüsseln benutzt.
-
-Du kannst ihn verändern.
-
-WICHTIG:
-Da die Website komplett im Browser läuft,
-ist dieser Schlüssel nicht für Hochsicherheitsdaten
-geeignet.
-*/
-
-const SECRET_KEY =
-    "EINKAUF_WEBSITE_2026_SCHLUESSEL";
-
-
-/*
-============================================================
-PRODUKT HINZUFÜGEN
-============================================================
-*/
-
-function addProduct(containerId) {
-
-    const container =
-        document.getElementById(containerId);
-
-
-    const product =
-        document.createElement("div");
-
-
-    product.className = "product";
-
-
-    product.innerHTML = `
-
-        <button
-            class="delete"
-            onclick="this.parentElement.remove()">
-
-            🗑️
-
-        </button>
-
-        <input
-            class="product-name"
-            type="text"
-            placeholder="Produkt, z. B. Pizza"
-        >
-
-        <input
-            class="product-detail"
-            type="text"
-            placeholder="Menge / Merkmal, z. B. 2 Stück"
-        >
-
-    `;
-
-
-    container.appendChild(product);
-
-}
-
-
-/*
-============================================================
-PRODUKTE AUSLESEN
-============================================================
-*/
-
-function getProducts(containerId) {
-
-    const container =
-        document.getElementById(containerId);
-
-
-    const products = [];
-
-
-    container
-        .querySelectorAll(".product")
-        .forEach(product => {
-
-
-            const name =
-                product
-                .querySelector(".product-name")
-                .value
-                .trim();
-
-
-            const detail =
-                product
-                .querySelector(".product-detail")
-                .value
-                .trim();
-
-
-            if (name !== "") {
-
-                products.push({
-                    name: name,
-                    detail: detail
-                });
-
-            }
-
-        });
-
-
-    return products;
-
-}
-
-
-/*
-============================================================
-BESTELLUNG ERSTELLEN
-============================================================
-*/
-
-function createOrder() {
-
-    const person =
-        document
-        .getElementById("person")
-        .value
-        .trim();
-
-
-    if (person === "") {
-
-        showMessage(
-            "Bitte gib zuerst deinen Namen ein.",
-            "error"
-        );
-
-        return null;
-
-    }
-
-
-    const frozen =
-        getProducts("frozenProducts");
-
-
-    const cold =
-        getProducts("coldProducts");
-
-
-    const normal =
-        getProducts("normalProducts");
-
-
-    if (
-        frozen.length === 0 &&
-        cold.length === 0 &&
-        normal.length === 0
-    ) {
-
-        showMessage(
-            "Bitte füge mindestens ein Produkt hinzu.",
-            "error"
-        );
-
-        return null;
-
-    }
-
-
-    return {
-
-        person: person,
-
-        frozen: frozen,
-
-        cold: cold,
-
-        normal: normal,
-
-        time: new Date().toISOString()
-
-    };
-
-}
-
-
-/*
-============================================================
-TEXT -> BASE64
-============================================================
-*/
-
-function encodeText(text) {
-
-    const bytes =
-        new TextEncoder().encode(text);
-
-
-    let binary = "";
-
-
-    bytes.forEach(byte => {
-
-        binary += String.fromCharCode(byte);
-
-    });
-
-
-    return btoa(binary);
-
-}
-
-
-/*
-============================================================
-BASE64 -> TEXT
-============================================================
-*/
-
-function decodeText(encoded) {
-
-    const binary =
-        atob(encoded);
-
-
-    const bytes =
-        Uint8Array.from(
-            binary,
-            character => character.charCodeAt(0)
-        );
-
-
-    return new TextDecoder().decode(bytes);
-
-}
-
-
-/*
-============================================================
-EINFACHE XOR-VERSCHLÜSSELUNG
-============================================================
-
-Der Inhalt wird vor dem Base64-Code
-noch mit einem Schlüssel verschlüsselt.
-
-============================================================
-*/
-
-function encrypt(text) {
-
-    let result = "";
-
-
-    for (
-        let i = 0;
-        i < text.length;
-        i++
-    ) {
-
-        const charCode =
-            text.charCodeAt(i);
-
-
-        const keyCode =
-            SECRET_KEY.charCodeAt(
-                i % SECRET_KEY.length
-            );
-
-
-        result += String.fromCharCode(
-            charCode ^ keyCode
-        );
-
-    }
-
-
-    return encodeText(result);
-
-}
-
-
-/*
-============================================================
-ENTSCHLÜSSELN
-============================================================
-*/
-
-function decrypt(encoded) {
-
-    const encrypted =
-        decodeText(encoded);
-
-
-    let result = "";
-
-
-    for (
-        let i = 0;
-        i < encrypted.length;
-        i++
-    ) {
-
-        const charCode =
-            encrypted.charCodeAt(i);
-
-
-        const keyCode =
-            SECRET_KEY.charCodeAt(
-                i % SECRET_KEY.length
-            );
-
-
-        result += String.fromCharCode(
-            charCode ^ keyCode
-        );
-
-    }
-
-
-    return result;
-
-}
-
-
-/*
-============================================================
-BESTELLUNG PER MAIL SENDEN
-============================================================
-*/
-
-function sendOrder() {
-
-    const order =
-        createOrder();
-
-
-    if (!order) {
-        return;
-    }
-
+```html
+<!DOCTYPE html> 
+<html lang="de"> 
+<head> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+ 
+<title>🛒 Einkauf</title> 
+ 
+<style> 
+ 
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+} 
+ 
+body { 
+    margin: 0; 
+    background: #f2f3f5; 
+    font-family: Arial, sans-serif; 
+    color: #222; 
+} 
+ 
+.container { 
+    width: 100%; 
+    max-width: 600px; 
+    margin: auto; 
+    padding: 15px; 
+} 
+ 
+header { 
+    background: white; 
+    padding: 22px; 
+    border-radius: 20px; 
+    text-align: center; 
+    margin-bottom: 15px; 
+    box-shadow: 0 3px 12px rgba(0,0,0,.08); 
+} 
+ 
+header h1 { 
+    margin: 0; 
+    font-size: 29px; 
+} 
+ 
+header p { 
+    color: #777; 
+    margin-bottom: 0; 
+} 
+ 
+.card { 
+    background: white; 
+    padding: 17px; 
+    border-radius: 18px; 
+    margin-bottom: 15px; 
+    box-shadow: 0 3px 12px rgba(0,0,0,.06); 
+} 
+ 
+label { 
+    display: block; 
+    font-weight: bold; 
+    margin-bottom: 7px; 
+} 
+ 
+input, 
+textarea { 
+    width: 100%; 
+    padding: 14px; 
+    font-size: 17px; 
+    border: 1px solid #d4d7db; 
+    border-radius: 12px; 
+    background: #fafafa; 
+    outline: none; 
+} 
+ 
+input:focus, 
+textarea:focus { 
+    background: white; 
+    border-color: #555; 
+} 
+ 
+textarea { 
+    min-height: 180px; 
+    resize: vertical; 
+    font-family: monospace; 
+} 
+ 
+.category-title { 
+    font-size: 21px; 
+    font-weight: bold; 
+    margin-bottom: 12px; 
+} 
+ 
+.product { 
+    position: relative; 
+    background: #f5f6f7; 
+    padding: 12px; 
+    padding-right: 55px; 
+    border-radius: 13px; 
+    margin-bottom: 10px; 
+} 
+ 
+.product input { 
+    margin-bottom: 8px; 
+} 
+ 
+.product input:last-of-type { 
+    margin-bottom: 0; 
+} 
+ 
+.delete { 
+    position: absolute; 
+    top: 10px; 
+    right: 9px; 
+ 
+    width: 37px; 
+    height: 37px; 
+ 
+    border: none; 
+    border-radius: 50%; 
+ 
+    background: #ffdede; 
+ 
+    font-size: 17px; 
+} 
+ 
+.add-button { 
+    width: 100%; 
+    padding: 13px; 
+ 
+    background: white; 
+ 
+    border: 2px dashed #bbb; 
+    border-radius: 12px; 
+ 
+    font-size: 16px; 
+    font-weight: bold; 
+} 
+ 
+.send-button { 
+    width: 100%; 
+    padding: 17px; 
+ 
+    border: none; 
+    border-radius: 14px; 
+ 
+    background: #222; 
+    color: white; 
+ 
+    font-size: 18px; 
+    font-weight: bold; 
+} 
+ 
+.admin-button { 
+    display: none; 
+ 
+    width: 100%; 
+    margin-top: 10px; 
+    padding: 14px; 
+ 
+    border: none; 
+    border-radius: 13px; 
+ 
+    background: #673de6; 
+    color: white; 
+ 
+    font-size: 17px; 
+    font-weight: bold; 
+} 
+ 
+.back-button { 
+    width: 100%; 
+    padding: 14px; 
+ 
+    border: none; 
+    border-radius: 13px; 
+ 
+    background: #e8e9eb; 
+ 
+    font-size: 16px; 
+    font-weight: bold; 
+} 
+ 
+#adminPanel { 
+    display: none; 
+} 
+ 
+.order-result { 
+    background: #f5f6f7; 
+    padding: 15px; 
+    border-radius: 15px; 
+    margin-top: 15px; 
+} 
+ 
+.order-name { 
+    font-size: 22px; 
+    font-weight: bold; 
+    margin-bottom: 12px; 
+} 
+ 
+.admin-category { 
+    font-weight: bold; 
+    margin-top: 12px; 
+} 
+ 
+.admin-product { 
+    background: white; 
+    padding: 10px; 
+    border-radius: 10px; 
+    margin-top: 6px; 
+} 
+ 
+.message { 
+    display: none; 
+    padding: 13px; 
+    border-radius: 12px; 
+    margin-bottom: 15px; 
+    text-align: center; 
+    font-weight: bold; 
+} 
+ 
+.success { 
+    display: block; 
+    background: #dff6e4; 
+    color: #17652a; 
+} 
+ 
+.error { 
+    display: block; 
+    background: #ffe0e0; 
+    color: #8a1717; 
+} 
+ 
+.small { 
+    color: #777; 
+    font-size: 14px; 
+    line-height: 1.4; 
+} 
+ 
+button { 
+    cursor: pointer; 
+} 
+ 
+button:active { 
+    transform: scale(.98); 
+} 
+ 
+.hidden { 
+    display: none !important; 
+} 
+ 
+</style> 
+</head> 
+ 
+ 
+<body> 
+ 
+<div class="container"> 
+ 
+ 
+<header> 
+ 
+    <h1>🛒 Einkauf</h1> 
+ 
+    <p> 
+        Trag ein, was du gerne möchtest. 
+    </p> 
+ 
+</header> 
+ 
+ 
+<div id="message" class="message"></div> 
+ 
+ 
+<!-- ========================= --> 
+<!-- PERSON --> 
+<!-- ========================= --> 
+ 
+<div class="card"> 
+ 
+    <label> 
+        Wer bist du? 
+    </label> 
+ 
+    <input 
+        id="person" 
+        type="text" 
+        placeholder="z. B. Lion" 
+        autocomplete="off" 
+    > 
+ 
+    <button 
+        id="adminButton" 
+        class="admin-button" 
+        onclick="openAdmin()"> 
+ 
+        👑 Admin-Bereich 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+<!-- ========================= --> 
+<!-- NORMALE WEBSITE --> 
+<!-- ========================= --> 
+ 
+<div id="shoppingArea"> 
+ 
+ 
+<!-- TIEFKÜHL --> 
+ 
+<div class="card"> 
+ 
+    <div class="category-title"> 
+        🧊 Tiefkühl 
+    </div> 
+ 
+    <div id="frozenProducts"></div> 
+ 
+    <button 
+        class="add-button" 
+        onclick="addProduct('frozenProducts')"> 
+ 
+        ＋ Produkt hinzufügen 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+<!-- KÜHL --> 
+ 
+<div class="card"> 
+ 
+    <div class="category-title"> 
+        ❄️ Kühl 
+    </div> 
+ 
+    <div id="coldProducts"></div> 
+ 
+    <button 
+        class="add-button" 
+        onclick="addProduct('coldProducts')"> 
+ 
+        ＋ Produkt hinzufügen 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+<!-- NORMAL --> 
+ 
+<div class="card"> 
+ 
+    <div class="category-title"> 
+        🛍️ Normal 
+    </div> 
+ 
+    <div id="normalProducts"></div> 
+ 
+    <button 
+        class="add-button" 
+        onclick="addProduct('normalProducts')"> 
+ 
+        ＋ Produkt hinzufügen 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+<!-- ABSENDEN --> 
+ 
+<div class="card"> 
+ 
+    <button 
+        class="send-button" 
+        onclick="sendOrder()"> 
+ 
+        📧 Bestellung per E-Mail senden 
+ 
+    </button> 
+ 
+    <p class="small"> 
+        Beim Absenden wird deine Mail-App geöffnet. 
+        Die Bestellung wird automatisch als Code 
+        in die E-Mail eingefügt. 
+    </p> 
+ 
+</div> 
+ 
+ 
+</div> 
+ 
+ 
+<!-- ========================= --> 
+<!-- ADMIN --> 
+<!-- ========================= --> 
+ 
+<div id="adminPanel"> 
+ 
+ 
+<div class="card"> 
+ 
+    <h2>👑 Admin-Bereich</h2> 
+ 
+    <p> 
+        Füge hier den Bestellcode aus der E-Mail ein. 
+    </p> 
+ 
+    <textarea 
+        id="codeInput" 
+        placeholder="Bestellcode hier einfügen..." 
+    ></textarea> 
+ 
+    <br><br> 
+ 
+    <button 
+        class="send-button" 
+        onclick="decodeOrder()"> 
+ 
+        🔓 Bestellung entschlüsseln 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+<div id="decodedOrder"></div> 
+ 
+ 
+<div class="card"> 
+ 
+    <button 
+        class="back-button" 
+        onclick="closeAdmin()"> 
+ 
+        ← Zurück 
+ 
+    </button> 
+ 
+</div> 
+ 
+ 
+</div> 
+ 
+</div> 
+ 
+ 
+<script> 
+ 
+ 
+/* 
+============================================================ 
+EINSTELLUNGEN 
+============================================================ 
+*/ 
+ 
+ 
+/* 
+DEINE E-MAIL-ADRESSE HIER EINTRAGEN 
+*/ 
+ 
+const ADMIN_EMAIL = "lion.born@convos.schule"; 
+ 
+ 
+/* 
+Dieser Schlüssel wird zum Verschlüsseln 
+und Entschlüsseln benutzt. 
+ 
+Du kannst ihn verändern. 
+ 
+WICHTIG: 
+Da die Website komplett im Browser läuft, 
+ist dieser Schlüssel nicht für Hochsicherheitsdaten 
+geeignet. 
+*/ 
+ 
+const SECRET_KEY = 
+    "EINKAUF_WEBSITE_2026_SCHLUESSEL"; 
+ 
+ 
+/* 
+============================================================ 
+PRODUKT HINZUFÜGEN 
+============================================================ 
+*/ 
+ 
+function addProduct(containerId) { 
+ 
+    const container = 
+        document.getElementById(containerId); 
+ 
+ 
+    const product = 
+        document.createElement("div"); 
+ 
+ 
+    product.className = "product"; 
+ 
+ 
+    product.innerHTML = ` 
+ 
+        <button 
+            class="delete" 
+            onclick="this.parentElement.remove()"> 
+ 
+            🗑️ 
+ 
+        </button> 
+ 
+        <input 
+            class="product-name" 
+            type="text" 
+            placeholder="Produkt, z. B. Pizza" 
+        > 
+ 
+        <input 
+            class="product-detail" 
+            type="text" 
+            placeholder="Menge / Merkmal, z. B. 2 Stück" 
+        > 
+ 
+    `; 
+ 
+ 
+    container.appendChild(product); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+PRODUKTE AUSLESEN 
+============================================================ 
+*/ 
+ 
+function getProducts(containerId) { 
+ 
+    const container = 
+        document.getElementById(containerId); 
+ 
+ 
+    const products = []; 
+ 
+ 
+    container 
+        .querySelectorAll(".product") 
+        .forEach(product => { 
+ 
+ 
+            const name = 
+                product 
+                .querySelector(".product-name") 
+                .value 
+                .trim(); 
+ 
+ 
+            const detail = 
+                product 
+                .querySelector(".product-detail") 
+                .value 
+                .trim(); 
+ 
+ 
+            if (name !== "") { 
+ 
+                products.push({ 
+                    name: name, 
+                    detail: detail 
+                }); 
+ 
+            } 
+ 
+        }); 
+ 
+ 
+    return products; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+BESTELLUNG ERSTELLEN 
+============================================================ 
+*/ 
+ 
+function createOrder() { 
+ 
+    const person = 
+        document 
+        .getElementById("person") 
+        .value 
+        .trim(); 
+ 
+ 
+    if (person === "") { 
+ 
+        showMessage( 
+            "Bitte gib zuerst deinen Namen ein.", 
+            "error" 
+        ); 
+ 
+        return null; 
+ 
+    } 
+ 
+ 
+    const frozen = 
+        getProducts("frozenProducts"); 
+ 
+ 
+    const cold = 
+        getProducts("coldProducts"); 
+ 
+ 
+    const normal = 
+        getProducts("normalProducts"); 
+ 
+ 
+    if ( 
+        frozen.length === 0 && 
+        cold.length === 0 && 
+        normal.length === 0 
+    ) { 
+ 
+        showMessage( 
+            "Bitte füge mindestens ein Produkt hinzu.", 
+            "error" 
+        ); 
+ 
+        return null; 
+ 
+    } 
+ 
+ 
+    return { 
+ 
+        person: person, 
+ 
+        frozen: frozen, 
+ 
+        cold: cold, 
+ 
+        normal: normal, 
+ 
+        time: new Date().toISOString() 
+ 
+    }; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+TEXT -> BASE64 
+============================================================ 
+*/ 
+ 
+function encodeText(text) { 
+ 
+    const bytes = 
+        new TextEncoder().encode(text); 
+ 
+ 
+    let binary = ""; 
+ 
+ 
+    bytes.forEach(byte => { 
+ 
+        binary += String.fromCharCode(byte); 
+ 
+    }); 
+ 
+ 
+    return btoa(binary); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+BASE64 -> TEXT 
+============================================================ 
+*/ 
+ 
+function decodeText(encoded) { 
+ 
+    const binary = 
+        atob(encoded); 
+ 
+ 
+    const bytes = 
+        Uint8Array.from( 
+            binary, 
+            character => character.charCodeAt(0) 
+        ); 
+ 
+ 
+    return new TextDecoder().decode(bytes); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+EINFACHE XOR-VERSCHLÜSSELUNG 
+============================================================ 
+ 
+Der Inhalt wird vor dem Base64-Code 
+noch mit einem Schlüssel verschlüsselt. 
+ 
+============================================================ 
+*/ 
+ 
+function encrypt(text) { 
+ 
+    let result = ""; 
+ 
+ 
+    for ( 
+        let i = 0; 
+        i < text.length; 
+        i++ 
+    ) { 
+ 
+        const charCode = 
+            text.charCodeAt(i); 
+ 
+ 
+        const keyCode = 
+            SECRET_KEY.charCodeAt( 
+                i % SECRET_KEY.length 
+            ); 
+ 
+ 
+        result += String.fromCharCode( 
+            charCode ^ keyCode 
+        ); 
+ 
+    } 
+ 
+ 
+    return encodeText(result); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+ENTSCHLÜSSELN 
+============================================================ 
+*/ 
+ 
+function decrypt(encoded) { 
+ 
+    const encrypted = 
+        decodeText(encoded); 
+ 
+ 
+    let result = ""; 
+ 
+ 
+    for ( 
+        let i = 0; 
+        i < encrypted.length; 
+        i++ 
+    ) { 
+ 
+        const charCode = 
+            encrypted.charCodeAt(i); 
+ 
+ 
+        const keyCode = 
+            SECRET_KEY.charCodeAt( 
+                i % SECRET_KEY.length 
+            ); 
+ 
+ 
+        result += String.fromCharCode( 
+            charCode ^ keyCode 
+        ); 
+ 
+    } 
+ 
+ 
+    return result; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+BESTELLUNG PER MAIL SENDEN 
+============================================================ 
+*/ 
+ 
+function sendOrder() { 
+ 
+    const order = 
+        createOrder(); 
+ 
+ 
+    if (!order) { 
+        return; 
+    } 
+ 
+ 
+    /* 
+    Bestellung als JSON speichern 
+    */ 
+ 
+    const json = 
+        JSON.stringify(order); 
+ 
+ 
+    /* 
+    Verschlüsseln 
+    */ 
+ 
+    const code = 
+        encrypt(json); 
+ 
+ 
+    /* 
+    E-Mail erstellen 
+    */ 
+ 
+    const subject = 
+        "🛒 Neue Bestellung von " + 
+        order.person; 
+ 
+ 
+    const body = 
+ 
+`Hallo! 
+ 
+Es gibt eine neue Einkaufsbestellung. 
+ 
+Die Bestellung ist als Code gespeichert. 
+ 
+BESTELLCODE: 
+${code} 
+ 
+ 
+Vielen Dank für ihre Bestellung! 
+ 
+Mit freundlichen Grüßen 
+ihre Einkaufswebsite`; 
+ 
+ 
+    /* 
+    Mail-App öffnen 
+    */ 
+ 
+    const mailto = 
+        "mailto:" + 
+        ADMIN_EMAIL + 
+        "?subject=" + 
+        encodeURIComponent(subject) + 
+        "&body=" + 
+        encodeURIComponent(body); 
+ 
+ 
+    window.location.href = mailto; 
+ 
+ 
+    /* 
+    Eingaben zurücksetzen 
+    */ 
+ 
+    setTimeout(() => { 
+ 
+        clearProducts(); 
+ 
+    }, 1000); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+ADMIN BUTTON 
+============================================================ 
+*/ 
+ 
+document 
+    .getElementById("person") 
+    .addEventListener( 
+        "input", 
+        function() { 
+ 
+ 
+            const name = 
+                this.value 
+                .trim() 
+                .toLowerCase(); 
+ 
+ 
+            const button = 
+                document.getElementById( 
+                    "adminButton" 
+                ); 
+ 
+ 
+            if (name === "admin") { 
+ 
+                button.style.display = 
+                    "block"; 
+ 
+            } else { 
+ 
+                button.style.display = 
+                    "none"; 
+ 
+            } 
+ 
+        } 
+    ); 
+ 
+ 
+/* 
+============================================================ 
+ADMIN ÖFFNEN 
+============================================================ 
+*/ 
+ 
+function openAdmin() { 
+ 
+    const name = 
+        document 
+        .getElementById("person") 
+        .value 
+        .trim() 
+        .toLowerCase(); 
+ 
+ 
+    if (name !== "admin") { 
+ 
+        return; 
+ 
+    } 
+ 
+ 
+    document 
+        .getElementById("shoppingArea") 
+        .classList.add("hidden"); 
+ 
+ 
+    document 
+        .getElementById("adminPanel") 
+        .style.display = 
+            "block"; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+ADMIN SCHLIESSEN 
+============================================================ 
+*/ 
+ 
+function closeAdmin() { 
+ 
+    document 
+        .getElementById("adminPanel") 
+        .style.display = 
+            "none"; 
+ 
+ 
+    document 
+        .getElementById("shoppingArea") 
+        .classList.remove("hidden"); 
+ 
+ 
+    document 
+        .getElementById("codeInput") 
+        .value = ""; 
+ 
+ 
+    document 
+        .getElementById("decodedOrder") 
+        .innerHTML = ""; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+CODE ENTSCHLÜSSELN 
+============================================================ 
+*/ 
+ 
+function decodeOrder() { 
+ 
+    const code = 
+        document 
+        .getElementById("codeInput") 
+        .value 
+        .trim(); 
+ 
+ 
+    if (code === "") { 
+ 
+        showMessage( 
+            "Bitte füge zuerst einen Bestellcode ein.", 
+            "error" 
+        ); 
+ 
+        return; 
+ 
+    } 
+ 
+ 
+    try { 
+ 
+        /* 
+        Entschlüsseln 
+        */ 
+ 
+        const json = 
+            decrypt(code); 
+ 
+ 
+        /* 
+        JSON wieder in Objekt umwandeln 
+        */ 
+ 
+        const order = 
+            JSON.parse(json); 
+ 
+ 
+        /* 
+        Bestellung anzeigen 
+        */ 
+ 
+        displayOrder(order); 
+ 
+ 
+        showMessage( 
+            "✅ Bestellung erfolgreich entschlüsselt.", 
+            "success" 
+        ); 
+ 
+ 
+    } catch (error) { 
+ 
+        console.error(error); 
+ 
+        document 
+            .getElementById("decodedOrder") 
+            .innerHTML = ""; 
+ 
+ 
+        showMessage( 
+            "❌ Der Bestellcode ist ungültig oder beschädigt.", 
+            "error" 
+        ); 
+ 
+    } 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+BESTELLUNG ANZEIGEN 
+============================================================ 
+*/ 
+ 
+function displayOrder(order) { 
+ 
+    let html = ` 
+ 
+        <div class="card order-result"> 
+ 
+            <div class="order-name"> 
+                👤 ${escapeHTML(order.person)} 
+            </div> 
+ 
+    `; 
+ 
+ 
+    /* 
+    Tiefkühl 
+    */ 
+ 
+    if ( 
+        order.frozen && 
+        order.frozen.length > 0 
+    ) { 
+ 
+        html += ` 
+ 
+            <div class="admin-category"> 
+                🧊 Tiefkühl 
+            </div> 
+ 
+        `; 
+ 
+ 
+        order.frozen.forEach(product => { 
+ 
+            html += createProductHTML(product); 
+ 
+        }); 
+ 
+    } 
+ 
+ 
+    /* 
+    Kühl 
+    */ 
+ 
+    if ( 
+        order.cold && 
+        order.cold.length > 0 
+    ) { 
+ 
+        html += ` 
+ 
+            <div class="admin-category"> 
+                ❄️ Kühl 
+            </div> 
+ 
+        `; 
+ 
+ 
+        order.cold.forEach(product => { 
+ 
+            html += createProductHTML(product); 
+ 
+        }); 
+ 
+    } 
+ 
+ 
+    /* 
+    Normal 
+    */ 
+ 
+    if ( 
+        order.normal && 
+        order.normal.length > 0 
+    ) { 
+ 
+        html += ` 
+ 
+            <div class="admin-category"> 
+                🛍️ Normal 
+            </div> 
+ 
+        `; 
+ 
+ 
+        order.normal.forEach(product => { 
+ 
+            html += createProductHTML(product); 
+ 
+        }); 
+ 
+    } 
+ 
+ 
+    html += ` 
+ 
+        </div> 
+ 
+    `; 
+ 
+ 
+    document 
+        .getElementById("decodedOrder") 
+        .innerHTML = html;
 
     /*
-    Bestellung als JSON speichern
+    Kopier-Button unter der Bestellung
     */
-
-    const json =
-        JSON.stringify(order);
-
-
-    /*
-    Verschlüsseln
-    */
-
-    const code =
-        encrypt(json);
-
-
-    /*
-    E-Mail erstellen
-    */
-
-    const subject =
-        "🛒 Neue Bestellung von " +
-        order.person;
-
-
-    const body =
-
-`Hallo!
-
-Es gibt eine neue Einkaufsbestellung.
-
-Die Bestellung ist als Code gespeichert.
-
-BESTELLCODE:
-${code}
-
-
-Vielen Dank für ihre Bestellung!
-
-Mit freundlichen Grüßen
-ihre Einkaufswebsite`;
-
-
-    /*
-    Mail-App öffnen
-    */
-
-    const mailto =
-        "mailto:" +
-        ADMIN_EMAIL +
-        "?subject=" +
-        encodeURIComponent(subject) +
-        "&body=" +
-        encodeURIComponent(body);
-
-
-    window.location.href = mailto;
-
-
-    /*
-    Eingaben zurücksetzen
-    */
-
-    setTimeout(() => {
-
-        clearProducts();
-
-    }, 1000);
-
-}
-
-
-/*
-============================================================
-ADMIN BUTTON
-============================================================
-*/
-
-document
-    .getElementById("person")
-    .addEventListener(
-        "input",
-        function() {
-
-
-            const name =
-                this.value
-                .trim()
-                .toLowerCase();
-
-
-            const button =
-                document.getElementById(
-                    "adminButton"
-                );
-
-
-            if (name === "admin") {
-
-                button.style.display =
-                    "block";
-
-            } else {
-
-                button.style.display =
-                    "none";
-
-            }
-
-        }
-    );
-
-
-/*
-============================================================
-ADMIN ÖFFNEN
-============================================================
-*/
-
-function openAdmin() {
-
-    const name =
-        document
-        .getElementById("person")
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    if (name !== "admin") {
-
-        return;
-
-    }
-
-
-    document
-        .getElementById("shoppingArea")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("adminPanel")
-        .style.display =
-            "block";
-
-}
-
-
-/*
-============================================================
-ADMIN SCHLIESSEN
-============================================================
-*/
-
-function closeAdmin() {
-
-    document
-        .getElementById("adminPanel")
-        .style.display =
-            "none";
-
-
-    document
-        .getElementById("shoppingArea")
-        .classList.remove("hidden");
-
-
-    document
-        .getElementById("codeInput")
-        .value = "";
-
 
     document
         .getElementById("decodedOrder")
-        .innerHTML = "";
+        .innerHTML += `
+
+            <div class="card">
+
+                <button
+                    class="send-button"
+                    onclick="copyOrderAsTable()">
+
+                    📋 Tabelle kopieren
+
+                </button>
+
+            </div>
+
+        `;
 
 }
 
 
 /*
 ============================================================
-CODE ENTSCHLÜSSELN
+BESTELLUNG ALS TABELLE KOPIEREN
 ============================================================
 */
 
-function decodeOrder() {
+function copyOrderAsTable() {
 
     const code =
         document
@@ -1005,7 +1219,7 @@ function decodeOrder() {
     if (code === "") {
 
         showMessage(
-            "Bitte füge zuerst einen Bestellcode ein.",
+            "Keine Bestellung zum Kopieren vorhanden.",
             "error"
         );
 
@@ -1016,46 +1230,139 @@ function decodeOrder() {
 
     try {
 
-        /*
-        Entschlüsseln
-        */
-
         const json =
             decrypt(code);
 
-
-        /*
-        JSON wieder in Objekt umwandeln
-        */
 
         const order =
             JSON.parse(json);
 
 
-        /*
-        Bestellung anzeigen
-        */
-
-        displayOrder(order);
+        let rows = "";
 
 
-        showMessage(
-            "✅ Bestellung erfolgreich entschlüsselt.",
-            "success"
-        );
+        function addRows(categoryName, products) {
+
+            if (
+                products &&
+                products.length > 0
+            ) {
+
+                products.forEach(product => {
+
+                    rows += `
+                        <tr>
+                            <td>${escapeHTML(categoryName)}</td>
+                            <td>${escapeHTML(product.name)}</td>
+                            <td>${escapeHTML(product.detail || "")}</td>
+                        </tr>
+                    `;
+
+                });
+
+            }
+
+        }
+
+
+        addRows("Tiefkühl", order.frozen);
+        addRows("Kühl", order.cold);
+        addRows("Normal", order.normal);
+
+
+        const tableHTML = `
+
+            <table border="1"
+                   style="border-collapse: collapse; width: 100%;">
+
+                <thead>
+
+                    <tr>
+                        <th>Person</th>
+                        <th>Kategorie</th>
+                        <th>Produkt</th>
+                        <th>Menge / Merkmal</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${rows.replace(
+                        /<tr>/g,
+                        `<tr><td>${escapeHTML(order.person)}</td>`
+                    )}
+
+                </tbody>
+
+            </table>
+
+        `;
+
+
+        const plainText =
+            "Person\tKategorie\tProdukt\tMenge / Merkmal\n" +
+            orderRowsAsText(order);
+
+
+        if (
+            navigator.clipboard &&
+            window.ClipboardItem
+        ) {
+
+            const clipboardData = {
+
+                "text/html":
+                    new Blob(
+                        [tableHTML],
+                        { type: "text/html" }
+                    ),
+
+                "text/plain":
+                    new Blob(
+                        [plainText],
+                        { type: "text/plain" }
+                    )
+
+            };
+
+
+            navigator.clipboard.write(
+                [
+                    new ClipboardItem(clipboardData)
+                ]
+            )
+            .then(() => {
+
+                showMessage(
+                    "✅ Bestellung als Tabelle kopiert.",
+                    "success"
+                );
+
+            })
+            .catch(() => {
+
+                copyPlainTextFallback(
+                    plainText
+                );
+
+            });
+
+        } else {
+
+            copyPlainTextFallback(
+                plainText
+            );
+
+        }
 
 
     } catch (error) {
 
         console.error(error);
 
-        document
-            .getElementById("decodedOrder")
-            .innerHTML = "";
-
-
         showMessage(
-            "❌ Der Bestellcode ist ungültig oder beschädigt.",
+            "❌ Die Bestellung konnte nicht kopiert werden.",
             "error"
         );
 
@@ -1066,224 +1373,213 @@ function decodeOrder() {
 
 /*
 ============================================================
-BESTELLUNG ANZEIGEN
+BESTELLUNG ALS TEXT FÜR FALLBACK
 ============================================================
 */
 
-function displayOrder(order) {
+function orderRowsAsText(order) {
 
-    let html = `
-
-        <div class="card order-result">
-
-            <div class="order-name">
-                👤 ${escapeHTML(order.person)}
-            </div>
-
-    `;
+    let text = "";
 
 
-    /*
-    Tiefkühl
-    */
+    function addRows(categoryName, products) {
 
-    if (
-        order.frozen &&
-        order.frozen.length > 0
-    ) {
+        if (
+            products &&
+            products.length > 0
+        ) {
 
-        html += `
+            products.forEach(product => {
 
-            <div class="admin-category">
-                🧊 Tiefkühl
-            </div>
+                text +=
+                    order.person +
+                    "\t" +
+                    categoryName +
+                    "\t" +
+                    product.name +
+                    "\t" +
+                    (product.detail || "") +
+                    "\n";
 
-        `;
+            });
 
-
-        order.frozen.forEach(product => {
-
-            html += createProductHTML(product);
-
-        });
+        }
 
     }
 
 
-    /*
-    Kühl
-    */
-
-    if (
-        order.cold &&
-        order.cold.length > 0
-    ) {
-
-        html += `
-
-            <div class="admin-category">
-                ❄️ Kühl
-            </div>
-
-        `;
+    addRows("Tiefkühl", order.frozen);
+    addRows("Kühl", order.cold);
+    addRows("Normal", order.normal);
 
 
-        order.cold.forEach(product => {
-
-            html += createProductHTML(product);
-
-        });
-
-    }
-
-
-    /*
-    Normal
-    */
-
-    if (
-        order.normal &&
-        order.normal.length > 0
-    ) {
-
-        html += `
-
-            <div class="admin-category">
-                🛍️ Normal
-            </div>
-
-        `;
-
-
-        order.normal.forEach(product => {
-
-            html += createProductHTML(product);
-
-        });
-
-    }
-
-
-    html += `
-
-        </div>
-
-    `;
-
-
-    document
-        .getElementById("decodedOrder")
-        .innerHTML = html;
+    return text;
 
 }
 
 
 /*
 ============================================================
-PRODUKT DARSTELLEN
+FALLBACK KOPIEREN
 ============================================================
 */
 
-function createProductHTML(product) {
+function copyPlainTextFallback(text) {
 
-    let text =
-        escapeHTML(product.name);
+    const textarea =
+        document.createElement("textarea");
 
 
-    if (product.detail) {
+    textarea.value = text;
 
-        text +=
-            " — " +
-            escapeHTML(product.detail);
+
+    textarea.style.position =
+        "fixed";
+
+    textarea.style.left =
+        "-9999px";
+
+
+    document
+        .body
+        .appendChild(textarea);
+
+
+    textarea.select();
+
+
+    try {
+
+        document.execCommand("copy");
+
+
+        showMessage(
+            "✅ Bestellung kopiert.",
+            "success"
+        );
+
+    } catch (error) {
+
+        showMessage(
+            "❌ Kopieren nicht möglich. Bitte manuell kopieren.",
+            "error"
+        );
 
     }
 
 
-    return `
-
-        <div class="admin-product">
-            ${text}
-        </div>
-
-    `;
+    textarea.remove();
 
 }
 
 
-/*
-============================================================
-HTML SICHER MACHEN
-============================================================
-*/
-
-function escapeHTML(text) {
-
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-/*
-============================================================
-PRODUKTE LÖSCHEN
-============================================================
-*/
-
-function clearProducts() {
-
-    document
-        .getElementById("frozenProducts")
-        .innerHTML = "";
-
-
-    document
-        .getElementById("coldProducts")
-        .innerHTML = "";
-
-
-    document
-        .getElementById("normalProducts")
-        .innerHTML = "";
-
-}
-
-
-/*
-============================================================
-NACHRICHTEN
-============================================================
-*/
-
-function showMessage(text, type) {
-
-    const message =
-        document.getElementById("message");
-
-
-    message.textContent = text;
-
-
-    message.className =
-        "message " + type;
-
-
-    setTimeout(() => {
-
-        message.className =
-            "message";
-
-    }, 4000);
-
-}
-
-</script>
-
-
-    
-</body>
+/* 
+============================================================ 
+PRODUKT DARSTELLEN 
+============================================================ 
+*/ 
+ 
+function createProductHTML(product) { 
+ 
+    let text = 
+        escapeHTML(product.name); 
+ 
+ 
+    if (product.detail) { 
+ 
+        text += 
+            " — " + 
+            escapeHTML(product.detail); 
+ 
+    } 
+ 
+ 
+    return ` 
+ 
+        <div class="admin-product"> 
+            ${text} 
+        </div> 
+ 
+    `; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+HTML SICHER MACHEN 
+============================================================ 
+*/ 
+ 
+function escapeHTML(text) { 
+ 
+    return String(text) 
+        .replaceAll("&", "&amp;") 
+        .replaceAll("<", "&lt;") 
+        .replaceAll(">", "&gt;") 
+        .replaceAll('"', "&quot;") 
+        .replaceAll("'", "&#039;"); 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+PRODUKTE LÖSCHEN 
+============================================================ 
+*/ 
+ 
+function clearProducts() { 
+ 
+    document 
+        .getElementById("frozenProducts") 
+        .innerHTML = ""; 
+ 
+ 
+    document 
+        .getElementById("coldProducts") 
+        .innerHTML = ""; 
+ 
+ 
+    document 
+        .getElementById("normalProducts") 
+        .innerHTML = ""; 
+ 
+} 
+ 
+ 
+/* 
+============================================================ 
+NACHRICHTEN 
+============================================================ 
+*/ 
+ 
+function showMessage(text, type) { 
+ 
+    const message = 
+        document.getElementById("message"); 
+ 
+ 
+    message.textContent = text; 
+ 
+ 
+    message.className = 
+        "message " + type; 
+ 
+ 
+    setTimeout(() => { 
+ 
+        message.className = 
+            "message"; 
+ 
+    }, 4000); 
+ 
+} 
+ 
+</script> 
+ 
+ 
+     
+</body> 
 </html>
+```
